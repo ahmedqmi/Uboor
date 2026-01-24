@@ -104,10 +104,14 @@ export function TravelerPage() {
       </div>
 
       {showSuccess && (
-        <div className="success-message">
-          <span className="success-icon">✓</span>
-          تم إرسال طلب العبور بنجاح!
-        </div>
+        <>
+          <div className="success-overlay" onClick={() => setShowSuccess(false)}></div>
+          <div className="success-message">
+            <span className="success-icon">✓</span>
+            <h3>تم الإرسال بنجاح!</h3>
+            <p>تم إرسال طلب العبور وسيتم مراجعته من قبل الإدارة</p>
+          </div>
+        </>
       )}
 
       <form onSubmit={handleSubmit} className="travel-form">

@@ -1,5 +1,5 @@
 import { useTravelContext } from '../context/TravelContext';
-import { getSeverityColor, getSeverityLabel } from '../utils/suspiciousDetection';
+import { getSeverityColor, getSeverityLabel, getAuthorityLabel, getAuthorityIcon, getReportTypeLabel } from '../utils/suspiciousDetection';
 import './AdminPage.css';
 
 export function AdminPage() {
@@ -30,10 +30,28 @@ export function AdminPage() {
     return type === 'passport' ? 'جواز سفر' : 'بطاقة هوية';
   };
 
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case 'critical':
+        return '🚫';
+      case 'high':
+        return '⛔';
+      case 'medium':
+        return '⚠️';
+      default:
+        return '⚡';
+    }
+  };
+
   const totalRequests = travelRequests.length;
   const flaggedRequests = travelRequests.filter((r) => r.status === 'flagged').length;
   const pendingRequests = travelRequests.filter((r) => r.status === 'pending').length;
   const approvedRequests = travelRequests.filter((r) => r.status === 'approved').length;
+
+  // Count external reports
+  const externalReportsCount = Array.from(suspiciousFlags.values()).filter(
+    (f) => f.source === 'external_report'
+  ).length;
 
   if (isLoading) {
     return (
@@ -89,6 +107,14 @@ export function AdminPage() {
             <span className="stat-label">مشبوه</span>
           </div>
         </div>
+
+        <div className="stat-card reports">
+          <div className="stat-icon">📢</div>
+          <div className="stat-info">
+            <span className="stat-value">{externalReportsCount}</span>
+            <span className="stat-label">بلاغات خارجية</span>
+          </div>
+        </div>
       </div>
 
       {/* Alerts Section - Suspicious Passengers */}
@@ -111,14 +137,15 @@ export function AdminPage() {
                 return flaggedPassengers.map((passenger) => {
                   const flag = suspiciousFlags.get(passenger.id);
                   if (!flag) return null;
+                  const isExternalReport = flag.source === 'external_report' && flag.externalReport;
                   return (
                     <div
                       key={passenger.id}
-                      className="alert-item"
+                      className={`alert-item ${isExternalReport ? 'external-report' : ''}`}
                       style={{ borderRightColor: getSeverityColor(flag.severity) }}
                     >
                       <div className="alert-severity" style={{ backgroundColor: getSeverityColor(flag.severity) }}>
-                        {flag.severity === 'high' ? '⛔' : flag.severity === 'medium' ? '⚠️' : '⚡'}
+                        {getSeverityIcon(flag.severity)}
                       </div>
                       <div className="alert-content">
                         <div className="alert-passenger">
@@ -133,6 +160,31 @@ export function AdminPage() {
                             {getSeverityLabel(flag.severity)}
                           </span>
                         </div>
+
+                        {/* External Report Details */}
+                        {isExternalReport && flag.externalReport && (
+                          <div className="external-report-details">
+                            <div className="report-source">
+                              <span className="source-icon">{getAuthorityIcon(flag.externalReport.authority)}</span>
+                              <span className="source-name">{getAuthorityLabel(flag.externalReport.authority)}</span>
+                              <span className="report-type-badge">{getReportTypeLabel(flag.externalReport.reportType)}</span>
+                            </div>
+                            <div className="report-info">
+                              <span className="case-number">رقم القضية: {flag.externalReport.caseNumber}</span>
+                              <span className="report-date">تاريخ البلاغ: {formatDate(flag.externalReport.reportDate)}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Source indicator */}
+                        <div className="alert-source">
+                          {flag.source === 'external_report' ? (
+                            <span className="source-external">📢 بلاغ من جهة خارجية</span>
+                          ) : (
+                            <span className="source-system">🔍 كشف تلقائي من النظام</span>
+                          )}
+                        </div>
+
                         <div className="alert-car">
                           🚗 {request.carPlateNumber} - {request.carType}
                         </div>
@@ -212,10 +264,11 @@ export function AdminPage() {
                     <div className="passengers-grid">
                       {request.passengers.map((passenger) => {
                         const flag = suspiciousFlags.get(passenger.id);
+                        const isExternalReport = flag?.source === 'external_report';
                         return (
                           <div
                             key={passenger.id}
-                            className={`passenger-item ${flag ? 'flagged' : ''}`}
+                            className={`passenger-item ${flag ? 'flagged' : ''} ${isExternalReport ? 'has-report' : ''}`}
                           >
                             <div className="passenger-info">
                               <span className="passenger-name">{passenger.name}</span>
@@ -232,12 +285,17 @@ export function AdminPage() {
                                   backgroundColor: getSeverityColor(flag.severity),
                                 }}
                               >
-                                <span className="flag-icon">⚠️</span>
+                                <span className="flag-icon">{getSeverityIcon(flag.severity)}</span>
                                 <div className="flag-details">
                                   <span className="flag-reason">{flag.reason}</span>
                                   <span className="flag-severity">
                                     {getSeverityLabel(flag.severity)}
                                   </span>
+                                  {isExternalReport && flag.externalReport && (
+                                    <span className="flag-authority">
+                                      {getAuthorityIcon(flag.externalReport.authority)} {getAuthorityLabel(flag.externalReport.authority)}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             )}

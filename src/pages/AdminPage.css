@@ -117,6 +117,10 @@
   background: linear-gradient(135deg, #fee2e2, #fecaca);
 }
 
+.stat-card.reports .stat-icon {
+  background: linear-gradient(135deg, #fae8ff, #e9d5ff);
+}
+
 .stat-info {
   display: flex;
   flex-direction: column;
@@ -259,6 +263,85 @@
 .alert-car {
   font-size: 0.85rem;
   color: #64748b;
+}
+
+/* External Report Styles */
+.alert-item.external-report {
+  background: linear-gradient(135deg, #fef2f2, #fce7f3);
+  border-color: #f9a8d4;
+}
+
+.external-report-details {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.report-source {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.source-icon {
+  font-size: 1.25rem;
+}
+
+.source-name {
+  font-weight: 700;
+  color: #1e3a5f;
+  font-size: 0.95rem;
+}
+
+.report-type-badge {
+  background: #7f1d1d;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.report-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.case-number {
+  font-weight: 600;
+}
+
+.alert-source {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.source-external {
+  color: #7f1d1d;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.source-system {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.passenger-item.has-report {
+  border-color: #f9a8d4;
+  background: linear-gradient(135deg, #fff5f8, #fce7f3);
+}
+
+.flag-authority {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
 }
 
 /* Requests Section */

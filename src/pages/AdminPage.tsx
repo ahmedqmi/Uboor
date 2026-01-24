@@ -3,7 +3,7 @@ import { getSeverityColor, getSeverityLabel } from '../utils/suspiciousDetection
 import './AdminPage.css';
 
 export function AdminPage() {
-  const { travelRequests, suspiciousFlags, updateRequestStatus } = useTravelContext();
+  const { travelRequests, suspiciousFlags, isLoading, updateRequestStatus } = useTravelContext();
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ar-SA', {
@@ -34,6 +34,17 @@ export function AdminPage() {
   const flaggedRequests = travelRequests.filter((r) => r.status === 'flagged').length;
   const pendingRequests = travelRequests.filter((r) => r.status === 'pending').length;
   const approvedRequests = travelRequests.filter((r) => r.status === 'approved').length;
+
+  if (isLoading) {
+    return (
+      <div className="admin-page">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page">

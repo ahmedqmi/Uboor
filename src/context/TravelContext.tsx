@@ -1,12 +1,20 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { TravelRequest, SuspiciousFlag } from '../types';
 import { checkPassengerSuspicious } from '../utils/suspiciousDetection';
+import {
+  saveTravelRequest,
+  getAllTravelRequests,
+  updateTravelRequestStatus,
+  saveSuspiciousFlag,
+  getAllSuspiciousFlags,
+} from '../utils/database';
 
 interface TravelContextType {
   travelRequests: TravelRequest[];
   suspiciousFlags: Map<string, SuspiciousFlag>;
-  addTravelRequest: (request: TravelRequest) => void;
-  updateRequestStatus: (id: string, status: TravelRequest['status']) => void;
+  isLoading: boolean;
+  addTravelRequest: (request: TravelRequest) => Promise<void>;
+  updateRequestStatus: (id: string, status: TravelRequest['status']) => Promise<void>;
 }
 
 const TravelContext = createContext<TravelContextType | undefined>(undefined);
@@ -14,21 +22,43 @@ const TravelContext = createContext<TravelContextType | undefined>(undefined);
 export function TravelProvider({ children }: { children: ReactNode }) {
   const [travelRequests, setTravelRequests] = useState<TravelRequest[]>([]);
   const [suspiciousFlags, setSuspiciousFlags] = useState<Map<string, SuspiciousFlag>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
 
-  const addTravelRequest = useCallback((request: TravelRequest) => {
+  // Load data from IndexedDB on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [requests, flags] = await Promise.all([
+          getAllTravelRequests(),
+          getAllSuspiciousFlags(),
+        ]);
+        setTravelRequests(requests);
+        setSuspiciousFlags(flags);
+      } catch (error) {
+        console.error('Failed to load data from database:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const addTravelRequest = useCallback(async (request: TravelRequest) => {
     // Check each passenger for suspicious activity
     const newFlags = new Map(suspiciousFlags);
     let hasHighSeverityFlag = false;
 
-    request.passengers.forEach((passenger) => {
+    for (const passenger of request.passengers) {
       const flag = checkPassengerSuspicious(passenger);
       if (flag) {
         newFlags.set(passenger.id, flag);
         if (flag.severity === 'high') {
           hasHighSeverityFlag = true;
         }
+        // Save flag to database
+        await saveSuspiciousFlag(flag);
       }
-    });
+    }
 
     // Update request status based on flags
     const updatedRequest: TravelRequest = {
@@ -36,11 +66,17 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       status: hasHighSeverityFlag ? 'flagged' : 'pending',
     };
 
+    // Save to database
+    await saveTravelRequest(updatedRequest);
+
     setSuspiciousFlags(newFlags);
     setTravelRequests((prev) => [...prev, updatedRequest]);
   }, [suspiciousFlags]);
 
-  const updateRequestStatus = useCallback((id: string, status: TravelRequest['status']) => {
+  const updateRequestStatus = useCallback(async (id: string, status: TravelRequest['status']) => {
+    // Update in database
+    await updateTravelRequestStatus(id, status);
+
     setTravelRequests((prev) =>
       prev.map((req) => (req.id === id ? { ...req, status } : req))
     );
@@ -51,6 +87,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       value={{
         travelRequests,
         suspiciousFlags,
+        isLoading,
         addTravelRequest,
         updateRequestStatus,
       }}

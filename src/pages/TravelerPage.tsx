@@ -45,7 +45,7 @@ export function TravelerPage() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -75,19 +75,25 @@ export function TravelerPage() {
       status: 'pending',
     };
 
-    addTravelRequest(travelRequest);
+    try {
+      await addTravelRequest(travelRequest);
 
-    // Reset form
-    setCarPlateNumber('');
-    setCarType('');
-    setCarColor('');
-    setPassengers([
-      { id: uuidv4(), name: '', documentType: 'passport', documentNumber: '' },
-    ]);
+      // Reset form
+      setCarPlateNumber('');
+      setCarType('');
+      setCarColor('');
+      setPassengers([
+        { id: uuidv4(), name: '', documentType: 'passport', documentNumber: '' },
+      ]);
 
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (error) {
+      console.error('Failed to submit travel request:', error);
+      alert('حدث خطأ أثناء إرسال الطلب');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

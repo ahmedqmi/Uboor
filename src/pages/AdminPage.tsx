@@ -88,6 +88,60 @@ export function AdminPage() {
         </div>
       </div>
 
+      {/* Alerts Section - Suspicious Passengers */}
+      {flaggedRequests > 0 && (
+        <div className="alerts-section">
+          <div className="alert-header">
+            <span className="alert-icon">🚨</span>
+            <h2>تنبيهات أمنية</h2>
+            <span className="alert-count">{flaggedRequests} حالة مشبوهة</span>
+          </div>
+          <div className="alert-list">
+            {travelRequests
+              .filter((r) => r.status === 'flagged')
+              .slice()
+              .reverse()
+              .map((request) => {
+                const flaggedPassengers = request.passengers.filter((p) =>
+                  suspiciousFlags.has(p.id)
+                );
+                return flaggedPassengers.map((passenger) => {
+                  const flag = suspiciousFlags.get(passenger.id);
+                  if (!flag) return null;
+                  return (
+                    <div
+                      key={passenger.id}
+                      className="alert-item"
+                      style={{ borderRightColor: getSeverityColor(flag.severity) }}
+                    >
+                      <div className="alert-severity" style={{ backgroundColor: getSeverityColor(flag.severity) }}>
+                        {flag.severity === 'high' ? '⛔' : flag.severity === 'medium' ? '⚠️' : '⚡'}
+                      </div>
+                      <div className="alert-content">
+                        <div className="alert-passenger">
+                          <strong>{passenger.name}</strong>
+                          <span className="alert-doc">
+                            {getDocumentTypeLabel(passenger.documentType)}: {passenger.documentNumber}
+                          </span>
+                        </div>
+                        <div className="alert-reason">
+                          <span className="reason-text">{flag.reason}</span>
+                          <span className="severity-badge" style={{ backgroundColor: getSeverityColor(flag.severity) }}>
+                            {getSeverityLabel(flag.severity)}
+                          </span>
+                        </div>
+                        <div className="alert-car">
+                          🚗 {request.carPlateNumber} - {request.carType}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                });
+              })}
+          </div>
+        </div>
+      )}
+
       {/* Requests List */}
       <div className="requests-section">
         <h2>طلبات العبور</h2>

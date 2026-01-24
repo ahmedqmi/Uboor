@@ -8,6 +8,7 @@ import {
   saveSuspiciousFlag,
   getAllSuspiciousFlags,
 } from '../utils/database';
+import { sampleTravelRequests } from '../utils/sampleData';
 
 interface TravelContextType {
   travelRequests: TravelRequest[];
@@ -28,10 +29,31 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [requests, flags] = await Promise.all([
+        let [requests, flags] = await Promise.all([
           getAllTravelRequests(),
           getAllSuspiciousFlags(),
         ]);
+
+        // If database is empty, load sample data
+        if (requests.length === 0) {
+          const newFlags = new Map<string, SuspiciousFlag>();
+
+          for (const request of sampleTravelRequests) {
+            // Check passengers for suspicious activity
+            for (const passenger of request.passengers) {
+              const flag = checkPassengerSuspicious(passenger);
+              if (flag) {
+                newFlags.set(passenger.id, flag);
+                await saveSuspiciousFlag(flag);
+              }
+            }
+            await saveTravelRequest(request);
+          }
+
+          requests = sampleTravelRequests;
+          flags = newFlags;
+        }
+
         setTravelRequests(requests);
         setSuspiciousFlags(flags);
       } catch (error) {

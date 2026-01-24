@@ -93,7 +93,7 @@ export function TravelerPage() {
   return (
     <div className="traveler-page">
       <div className="page-header">
-        <h1>سافر</h1>
+        <h1>مسافر</h1>
         <p>أدخل بيانات السيارة والمسافرين للعبور</p>
       </div>
 

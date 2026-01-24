@@ -17,7 +17,7 @@ export function Header() {
             className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
           >
             <span className="nav-icon">✈️</span>
-            سافر
+            مسافر
           </Link>
           <Link
             to="/admin"

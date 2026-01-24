@@ -7,6 +7,7 @@ import {
   updateTravelRequestStatus,
   saveSuspiciousFlag,
   getAllSuspiciousFlags,
+  clearAllData,
 } from '../utils/database';
 import { sampleTravelRequests } from '../utils/sampleData';
 
@@ -16,6 +17,7 @@ interface TravelContextType {
   isLoading: boolean;
   addTravelRequest: (request: TravelRequest) => Promise<void>;
   updateRequestStatus: (id: string, status: TravelRequest['status']) => Promise<void>;
+  resetToSampleData: () => Promise<void>;
 }
 
 const TravelContext = createContext<TravelContextType | undefined>(undefined);
@@ -104,6 +106,36 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const resetToSampleData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Clear existing data
+      await clearAllData();
+
+      // Load sample data
+      const newFlags = new Map<string, SuspiciousFlag>();
+
+      for (const request of sampleTravelRequests) {
+        // Check passengers for suspicious activity
+        for (const passenger of request.passengers) {
+          const flag = checkPassengerSuspicious(passenger);
+          if (flag) {
+            newFlags.set(passenger.id, flag);
+            await saveSuspiciousFlag(flag);
+          }
+        }
+        await saveTravelRequest(request);
+      }
+
+      setTravelRequests(sampleTravelRequests);
+      setSuspiciousFlags(newFlags);
+    } catch (error) {
+      console.error('Failed to reset to sample data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return (
     <TravelContext.Provider
       value={{
@@ -112,6 +144,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
         isLoading,
         addTravelRequest,
         updateRequestStatus,
+        resetToSampleData,
       }}
     >
       {children}

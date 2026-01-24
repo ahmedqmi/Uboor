@@ -3,7 +3,7 @@ import { getSeverityColor, getSeverityLabel } from '../utils/suspiciousDetection
 import './AdminPage.css';
 
 export function AdminPage() {
-  const { travelRequests, suspiciousFlags, isLoading, updateRequestStatus } = useTravelContext();
+  const { travelRequests, suspiciousFlags, isLoading, updateRequestStatus, resetToSampleData } = useTravelContext();
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ar-SA', {
@@ -51,6 +51,9 @@ export function AdminPage() {
       <div className="page-header">
         <h1>لوحة التحكم</h1>
         <p>مراقبة وإدارة طلبات العبور</p>
+        <button className="reset-btn" onClick={resetToSampleData}>
+          🔄 تحميل بيانات تجريبية
+        </button>
       </div>
 
       {/* Statistics Cards */}

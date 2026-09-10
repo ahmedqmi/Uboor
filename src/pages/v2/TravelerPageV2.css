@@ -154,22 +154,39 @@
   font-size: 0.88rem;
 }
 
+/* appearance:none so the select uses these metrics instead of the browser's own,
+   which otherwise renders it shorter than the text inputs beside it. */
 .tv2-field input,
 .tv2-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.9rem 1.1rem;
+  line-height: 1.5;
   border: 2px solid var(--v2-border);
   border-radius: var(--v2-radius-sm);
   font-size: 1rem;
   font-family: 'Tajawal', sans-serif;
+  color: var(--v2-text);
   transition: all 0.2s ease;
   background: rgba(248, 250, 252, 0.7);
+}
+
+/* Chevron drawn on the left (the inline end in this RTL layout), with matching padding. */
+.tv2-field select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 1rem center;
+  padding-inline-end: 2.75rem;
+  cursor: pointer;
 }
 
 .tv2-field input:focus,
 .tv2-field select:focus {
   outline: none;
   border-color: var(--v2-primary-2);
-  background: #fff;
+  background-color: #fff;
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14);
 }
 

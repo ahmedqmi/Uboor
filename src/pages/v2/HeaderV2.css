@@ -100,25 +100,6 @@
   flex-shrink: 0;
 }
 
-.v2-classic-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.55);
-  text-decoration: none;
-  white-space: nowrap;
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.v2-classic-link:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
 @media (max-width: 768px) {
   .v2-header {
     padding: 0.75rem;
@@ -130,10 +111,5 @@
   }
   .v2-nav-link span:last-child {
     display: none;
-  }
-  .v2-classic-link {
-    order: 3;
-    width: 100%;
-    text-align: center;
   }
 }

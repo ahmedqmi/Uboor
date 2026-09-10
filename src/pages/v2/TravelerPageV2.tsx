@@ -1,7 +1,19 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Car, Users, ClipboardCheck, Check, Plane, Plus, ArrowLeft, ArrowRight } from 'lucide-react';
+import {
+  Car,
+  Users,
+  ClipboardCheck,
+  Check,
+  Plane,
+  Plus,
+  ArrowLeft,
+  ArrowRight,
+  ScanLine,
+} from 'lucide-react';
 import { useTravelContext } from '../../context/TravelContext';
+import { ScannerModal, type ScanResult } from './scan/ScannerModal';
+import type { ScanMode } from './scan/ocr';
 import type { Passenger, TravelRequest } from '../../types';
 import './TravelerPageV2.css';
 
@@ -33,6 +45,25 @@ export function TravelerPageV2() {
   const [carType, setCarType] = useState('');
   const [carColor, setCarColor] = useState('');
   const [passengers, setPassengers] = useState<PassengerForm[]>([emptyPassenger()]);
+
+  // Which scanner is open: the plate scanner, or a passenger's document scanner.
+  const [scanner, setScanner] = useState<{ mode: ScanMode; passengerId?: string } | null>(null);
+
+  const applyScan = (result: ScanResult) => {
+    if (result.mode === 'plate') {
+      setCarPlateNumber(result.plate);
+    } else if (scanner?.passengerId) {
+      const { fullName, documentNumber, documentType } = result.data;
+      setPassengers((current) =>
+        current.map((p) =>
+          p.id === scanner.passengerId
+            ? { ...p, name: fullName || p.name, documentNumber, documentType }
+            : p
+        )
+      );
+    }
+    setScanner(null);
+  };
 
   const addPassenger = () => setPassengers([...passengers, emptyPassenger()]);
 
@@ -110,6 +141,14 @@ export function TravelerPageV2() {
 
   return (
     <div className="v2-page traveler-v2">
+      {scanner && (
+        <ScannerModal
+          mode={scanner.mode}
+          onClose={() => setScanner(null)}
+          onResult={applyScan}
+        />
+      )}
+
       <div className="v2-page-header">
         <span className="v2-eyebrow">
           <Plane size={14} strokeWidth={2.25} /> نقطة العبور الذكية
@@ -153,6 +192,15 @@ export function TravelerPageV2() {
       <div className="tv2-card v2-glass">
         {step === 0 && (
           <section className="tv2-section">
+            <div className="tv2-section-top">
+              <button
+                type="button"
+                className="tv2-scan-btn"
+                onClick={() => setScanner({ mode: 'plate' })}
+              >
+                <ScanLine size={16} strokeWidth={2.25} /> مسح اللوحة بالكاميرا
+              </button>
+            </div>
             <div className="tv2-form-grid">
               <div className="tv2-field">
                 <label htmlFor="carPlate">رقم اللوحة</label>
@@ -198,6 +246,13 @@ export function TravelerPageV2() {
                 <div key={passenger.id} className="tv2-passenger-card">
                   <div className="tv2-passenger-header">
                     <span className="tv2-passenger-number">المسافر {index + 1}</span>
+                    <button
+                      type="button"
+                      className="tv2-scan-btn"
+                      onClick={() => setScanner({ mode: 'mrz', passengerId: passenger.id })}
+                    >
+                      <ScanLine size={15} strokeWidth={2.25} /> مسح الوثيقة
+                    </button>
                     {passengers.length > 1 && (
                       <button
                         type="button"

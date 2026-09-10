@@ -97,7 +97,34 @@
 .tv2-section-top {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.6rem;
   margin-bottom: 1rem;
+}
+
+.tv2-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.09);
+  color: var(--v2-primary);
+  font-family: 'Tajawal', sans-serif;
+  font-weight: 700;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tv2-scan-btn:hover {
+  background: rgba(16, 185, 129, 0.16);
+  transform: translateY(-1px);
+}
+
+.tv2-passenger-header .tv2-scan-btn {
+  margin-inline-start: auto;
 }
 
 .tv2-passenger-count {

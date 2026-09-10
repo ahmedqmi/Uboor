@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheck, Plane, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Plane, LayoutDashboard } from 'lucide-react';
 import './HeaderV2.css';
 
 export function HeaderV2() {
@@ -30,10 +30,6 @@ export function HeaderV2() {
             <span>لوحة التحكم</span>
           </Link>
         </nav>
-
-        <Link to="/" className="v2-classic-link">
-          الإصدار الكلاسيكي <ArrowRight size={13} strokeWidth={2.25} />
-        </Link>
       </div>
     </header>
   );

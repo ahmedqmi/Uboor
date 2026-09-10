@@ -3,21 +3,35 @@ import { TravelProvider } from './context/TravelContext';
 import { Header } from './components/Header';
 import { TravelerPage } from './pages/TravelerPage';
 import { AdminPage } from './pages/AdminPage';
+import { V2Layout } from './pages/v2/V2Layout';
+import { TravelerPageV2 } from './pages/v2/TravelerPageV2';
+import { AdminPageV2 } from './pages/v2/AdminPageV2';
 import './App.css';
 
 function App() {
   return (
     <TravelProvider>
       <Router>
-        <div className="app">
-          <Header />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<TravelerPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-            </Routes>
-          </main>
-        </div>
+        <Routes>
+          <Route
+            path="/*"
+            element={
+              <div className="app">
+                <Header />
+                <main className="main-content">
+                  <Routes>
+                    <Route path="/" element={<TravelerPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                  </Routes>
+                </main>
+              </div>
+            }
+          />
+          <Route path="/v2" element={<V2Layout />}>
+            <Route index element={<TravelerPageV2 />} />
+            <Route path="admin" element={<AdminPageV2 />} />
+          </Route>
+        </Routes>
       </Router>
     </TravelProvider>
   );

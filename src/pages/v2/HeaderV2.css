@@ -1,0 +1,131 @@
+.v2-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 1.5rem;
+}
+
+.v2-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.75rem 0.65rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.v2-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.v2-logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+  font-size: 1.2rem;
+}
+
+.v2-logo-text-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.v2-logo-text {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.v2-logo-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #04121c;
+  background: linear-gradient(135deg, #34d399, #22d3ee);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+
+.v2-nav {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.3rem;
+  border-radius: 999px;
+}
+
+.v2-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.v2-nav-link:hover {
+  color: #fff;
+}
+
+.v2-nav-link.active {
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #04121c;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.v2-classic-link {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.v2-classic-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .v2-header {
+    padding: 0.75rem;
+  }
+  .v2-header-inner {
+    flex-wrap: wrap;
+    border-radius: 24px;
+    justify-content: center;
+  }
+  .v2-nav-link span:last-child {
+    display: none;
+  }
+  .v2-classic-link {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}

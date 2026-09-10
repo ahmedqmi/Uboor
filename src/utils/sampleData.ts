@@ -129,4 +129,104 @@ export const sampleTravelRequests: TravelRequest[] = [
     submittedAt: new Date(Date.now() - 1000 * 60 * 300), // 5 hours ago
     status: 'flagged',
   },
+
+  // Earlier crossings by the same travellers - these build up the per-passenger history
+  {
+    id: uuidv4(),
+    carPlateNumber: 'ع ص ق ٧٨٩٠',
+    carType: 'شيفروليه ماليبو',
+    carColor: 'رمادي',
+    passengers: [
+      {
+        id: uuidv4(),
+        name: 'عبدالرحمن إبراهيم الدوسري',
+        documentType: 'passport',
+        documentNumber: 'C55667788',
+      },
+    ],
+    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
+    status: 'approved',
+  },
+  {
+    id: uuidv4(),
+    carPlateNumber: 'ع ص ق ٧٨٩٠',
+    carType: 'شيفروليه ماليبو',
+    carColor: 'رمادي',
+    passengers: [
+      {
+        id: uuidv4(),
+        name: 'عبدالرحمن إبراهيم الدوسري',
+        documentType: 'passport',
+        documentNumber: 'C55667788',
+      },
+      {
+        id: uuidv4(),
+        name: 'أحمد محمد العلي',
+        documentType: 'passport',
+        documentNumber: 'A12345678',
+      },
+    ],
+    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8), // 8 days ago
+    status: 'approved',
+  },
+  {
+    id: uuidv4(),
+    carPlateNumber: 'هـ و ي ٣٤٥٦',
+    carType: 'كيا سيراتو',
+    carColor: 'أزرق',
+    passengers: [
+      {
+        id: uuidv4(),
+        name: 'محمد سعد القحطاني',
+        documentType: 'id_card',
+        documentNumber: '2233445566',
+      },
+    ],
+    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12), // 12 days ago
+    status: 'flagged',
+  },
+  {
+    id: uuidv4(),
+    carPlateNumber: 'أ ب ج ١٢٣٤',
+    carType: 'تويوتا كامري',
+    carColor: 'أبيض',
+    passengers: [
+      {
+        id: uuidv4(),
+        name: 'أحمد محمد العلي',
+        documentType: 'passport',
+        documentNumber: 'A12345678',
+      },
+      {
+        id: uuidv4(),
+        name: 'سارة أحمد الخالد',
+        documentType: 'id_card',
+        documentNumber: '1234567890',
+      },
+    ],
+    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 21), // 21 days ago
+    status: 'approved',
+  },
+  {
+    id: uuidv4(),
+    carPlateNumber: 'ن ه ع ٥٥٤٤',
+    carType: 'جي إم سي يوكن',
+    carColor: 'أسود',
+    passengers: [
+      {
+        id: uuidv4(),
+        name: 'نورة فهد العتيبي',
+        documentType: 'passport',
+        documentNumber: 'B98765432',
+      },
+      {
+        id: uuidv4(),
+        name: 'عبدالرحمن إبراهيم الدوسري',
+        documentType: 'passport',
+        documentNumber: 'C55667788',
+      },
+    ],
+    submittedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 34), // 34 days ago
+    status: 'flagged',
+  },
 ];

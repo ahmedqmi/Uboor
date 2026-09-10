@@ -81,6 +81,39 @@ const EXTERNAL_REPORTS_DB: ExternalReport[] = [
     severity: 'medium',
     caseNumber: 'SEC-2024-77123',
   },
+  {
+    id: uuidv4(),
+    passengerId: '',
+    passengerDocumentNumber: '2233445566',
+    authority: 'customs',
+    reportType: 'criminal_record',
+    description: 'ضبط بضائع غير مصرح بها في عبور سابق',
+    reportDate: new Date('2023-08-14'),
+    severity: 'medium',
+    caseNumber: 'CUS-2023-44120',
+  },
+  {
+    id: uuidv4(),
+    passengerId: '',
+    passengerDocumentNumber: 'B98765432',
+    authority: 'court',
+    reportType: 'financial',
+    description: 'حكم قضائي بحجز تحفظي على الأصول',
+    reportDate: new Date('2024-07-02'),
+    severity: 'high',
+    caseNumber: 'COURT-2024-19087',
+  },
+  {
+    id: uuidv4(),
+    passengerId: '',
+    passengerDocumentNumber: 'C55667788',
+    authority: 'police',
+    reportType: 'watch_list',
+    description: 'بلاغ متابعة - ارتباط بقضية قيد التحقيق',
+    reportDate: new Date('2025-02-11'),
+    severity: 'medium',
+    caseNumber: 'POL-2025-10233',
+  },
 ];
 
 // Check for external reports
@@ -97,6 +130,13 @@ export function checkExternalReports(passenger: Passenger): ExternalReport | nul
   }
 
   return null;
+}
+
+// All reports filed against a document number, newest first
+export function getExternalReportsForDocument(documentNumber: string): ExternalReport[] {
+  return EXTERNAL_REPORTS_DB.filter((r) => r.passengerDocumentNumber === documentNumber).sort(
+    (a, b) => b.reportDate.getTime() - a.reportDate.getTime()
+  );
 }
 
 export function checkPassengerSuspicious(passenger: Passenger): SuspiciousFlag | null {

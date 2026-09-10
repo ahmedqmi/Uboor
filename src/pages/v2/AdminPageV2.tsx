@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ShieldCheck,
   RotateCcw,
@@ -12,6 +13,7 @@ import {
   Inbox,
   XCircle,
   Undo2,
+  ChevronLeft,
 } from 'lucide-react';
 import { useTravelContext } from '../../context/TravelContext';
 import {
@@ -21,7 +23,7 @@ import {
   getReportTypeLabel,
 } from '../../utils/suspiciousDetection';
 import { SeverityIcon, AuthorityIcon } from './icons';
-import type { TravelRequest } from '../../types';
+import type { Passenger, SuspiciousFlag, TravelRequest } from '../../types';
 import './AdminPageV2.css';
 
 type StatusFilter = 'all' | TravelRequest['status'];
@@ -58,6 +60,25 @@ export function AdminPageV2() {
     { key: 'approved', label: 'تمت الموافقة', count: approvedRequests },
     { key: 'flagged', label: 'مشبوه', count: flaggedRequests },
   ];
+
+  // One alert per flagged person (their most recent flagged crossing), not per crossing
+  const alerts = useMemo(() => {
+    const seen = new Set<string>();
+    const rows: { passenger: Passenger; flag: SuspiciousFlag; request: TravelRequest }[] = [];
+    const newestFirst = [...travelRequests].sort(
+      (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime()
+    );
+    for (const request of newestFirst) {
+      if (request.status !== 'flagged') continue;
+      for (const passenger of request.passengers) {
+        const flag = suspiciousFlags.get(passenger.id);
+        if (!flag || seen.has(passenger.documentNumber)) continue;
+        seen.add(passenger.documentNumber);
+        rows.push({ passenger, flag, request });
+      }
+    }
+    return rows;
+  }, [travelRequests, suspiciousFlags]);
 
   const filteredRequests = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -164,76 +185,53 @@ export function AdminPageV2() {
       </div>
 
       {/* Alerts */}
-      {flaggedRequests > 0 && (
+      {alerts.length > 0 && (
         <div className="av2-alerts v2-glass">
           <div className="av2-alerts-header">
             <span className="av2-alert-icon">
               <ShieldAlert size={20} strokeWidth={2.25} />
             </span>
             <h2>تنبيهات أمنية</h2>
-            <span className="av2-alert-count">{flaggedRequests} حالة مشبوهة</span>
+            <span className="av2-alert-count">
+              {alerts.length} {alerts.length >= 3 && alerts.length <= 10 ? 'حالات مشبوهة' : 'حالة مشبوهة'}
+            </span>
           </div>
           <div className="av2-alert-list">
-            {travelRequests
-              .filter((r) => r.status === 'flagged')
-              .slice()
-              .reverse()
-              .map((request) => {
-                const flaggedPassengers = request.passengers.filter((p) => suspiciousFlags.has(p.id));
-                return flaggedPassengers.map((passenger) => {
-                  const flag = suspiciousFlags.get(passenger.id);
-                  if (!flag) return null;
-                  const isExternalReport = flag.source === 'external_report' && flag.externalReport;
+            {alerts.map(({ passenger, flag, request }) => {
+                  const report = flag.source === 'external_report' ? flag.externalReport : undefined;
                   return (
-                    <div
+                    <Link
                       key={passenger.id}
-                      className={`av2-alert-item ${isExternalReport ? 'external' : ''}`}
+                      to={`/v2/passenger/${encodeURIComponent(passenger.documentNumber)}`}
+                      className="av2-alert-item"
                       style={{ borderInlineStartColor: getSeverityColor(flag.severity) }}
                     >
-                      <div className="av2-alert-severity" style={{ background: getSeverityColor(flag.severity) }}>
+                      <span
+                        className="av2-alert-severity"
+                        style={{ color: getSeverityColor(flag.severity) }}
+                      >
                         <SeverityIcon severity={flag.severity} className="av2-icon-on-color" />
+                      </span>
+                      <div className="av2-alert-main">
+                        <strong>{passenger.name}</strong>
+                        <span className="av2-alert-doc">{passenger.documentNumber}</span>
                       </div>
-                      <div className="av2-alert-content">
-                        <div className="av2-alert-passenger">
-                          <strong>{passenger.name}</strong>
-                          <span>
-                            {getDocumentTypeLabel(passenger.documentType)}: {passenger.documentNumber}
+                      <span className="av2-alert-reason">{flag.reason}</span>
+                      <div className="av2-alert-tags">
+                        {report && (
+                          <span className="av2-tag neutral">
+                            <AuthorityIcon authority={report.authority} className="av2-tag-icon" />
+                            {getReportTypeLabel(report.reportType)}
                           </span>
-                        </div>
-                        <div className="av2-alert-reason">
-                          <span className="av2-reason-text">{flag.reason}</span>
-                          <span
-                            className="av2-severity-badge"
-                            style={{ background: getSeverityColor(flag.severity) }}
-                          >
-                            {getSeverityLabel(flag.severity)}
-                          </span>
-                        </div>
-                        {isExternalReport && flag.externalReport && (
-                          <div className="av2-report-details">
-                            <div className="av2-report-source">
-                              <AuthorityIcon authority={flag.externalReport.authority} className="av2-authority-icon" />
-                              <span className="av2-source-name">
-                                {getAuthorityLabel(flag.externalReport.authority)}
-                              </span>
-                              <span className="av2-report-type-badge">
-                                {getReportTypeLabel(flag.externalReport.reportType)}
-                              </span>
-                            </div>
-                            <div className="av2-report-info">
-                              <span>رقم القضية: {flag.externalReport.caseNumber}</span>
-                              <span>تاريخ البلاغ: {formatDate(flag.externalReport.reportDate)}</span>
-                            </div>
-                          </div>
                         )}
-                        <div className="av2-alert-car">
-                          <Car size={14} strokeWidth={2} /> {request.carPlateNumber} - {request.carType}
-                        </div>
+                        <span className="av2-alert-plate">
+                          <Car size={13} strokeWidth={2} /> {request.carPlateNumber}
+                        </span>
                       </div>
-                    </div>
+                      <ChevronLeft size={16} strokeWidth={2.25} className="av2-passenger-chevron" />
+                    </Link>
                   );
-                });
-              })}
+            })}
           </div>
         </div>
       )}
@@ -323,34 +321,46 @@ export function AdminPageV2() {
                 <div className="av2-passengers-grid">
                   {request.passengers.map((passenger) => {
                     const flag = suspiciousFlags.get(passenger.id);
-                    const isExternalReport = flag?.source === 'external_report';
+                    const report = flag?.source === 'external_report' ? flag.externalReport : undefined;
                     return (
-                      <div
+                      <Link
                         key={passenger.id}
-                        className={`av2-passenger-item ${flag ? 'flagged' : ''} ${isExternalReport ? 'has-report' : ''}`}
+                        to={`/v2/passenger/${encodeURIComponent(passenger.documentNumber)}`}
+                        className={`av2-passenger-item ${flag ? 'flagged' : ''}`}
+                        style={flag ? { borderInlineStartColor: getSeverityColor(flag.severity) } : undefined}
                       >
                         <span className="av2-passenger-avatar">{passenger.name ? passenger.name[0] : '?'}</span>
                         <div className="av2-passenger-info">
                           <span className="av2-passenger-name">{passenger.name}</span>
                           <span className="av2-passenger-doc">
-                            {getDocumentTypeLabel(passenger.documentType)}: {passenger.documentNumber}
+                            {getDocumentTypeLabel(passenger.documentType)} · {passenger.documentNumber}
                           </span>
                           {flag && (
-                            <div className="av2-flag-indicator" style={{ background: getSeverityColor(flag.severity) }}>
-                              <SeverityIcon severity={flag.severity} className="av2-icon-on-color" />
-                              <div>
-                                <span className="av2-flag-reason">{flag.reason}</span>
-                                {isExternalReport && flag.externalReport && (
-                                  <span className="av2-flag-authority">
-                                    <AuthorityIcon authority={flag.externalReport.authority} className="av2-authority-icon" />{' '}
-                                    {getAuthorityLabel(flag.externalReport.authority)}
+                            <>
+                              <div className="av2-flag-tags">
+                                <span
+                                  className="av2-tag"
+                                  style={{
+                                    color: getSeverityColor(flag.severity),
+                                    background: `${getSeverityColor(flag.severity)}1a`,
+                                  }}
+                                >
+                                  <SeverityIcon severity={flag.severity} className="av2-tag-icon" />
+                                  {getSeverityLabel(flag.severity)}
+                                </span>
+                                {report && (
+                                  <span className="av2-tag neutral">
+                                    <AuthorityIcon authority={report.authority} className="av2-tag-icon" />
+                                    {getAuthorityLabel(report.authority)}
                                   </span>
                                 )}
                               </div>
-                            </div>
+                              <span className="av2-flag-reason">{flag.reason}</span>
+                            </>
                           )}
                         </div>
-                      </div>
+                        <ChevronLeft size={16} strokeWidth={2.25} className="av2-passenger-chevron" />
+                      </Link>
                     );
                   })}
                 </div>

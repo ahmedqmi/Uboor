@@ -6,6 +6,7 @@ import { AdminPage } from './pages/AdminPage';
 import { V2Layout } from './pages/v2/V2Layout';
 import { TravelerPageV2 } from './pages/v2/TravelerPageV2';
 import { AdminPageV2 } from './pages/v2/AdminPageV2';
+import { PassengerHistoryPage } from './pages/v2/PassengerHistoryPage';
 import './App.css';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Route path="/v2" element={<V2Layout />}>
             <Route index element={<TravelerPageV2 />} />
             <Route path="admin" element={<AdminPageV2 />} />
+            <Route path="passenger/:documentNumber" element={<PassengerHistoryPage />} />
           </Route>
         </Routes>
       </Router>

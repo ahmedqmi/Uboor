@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Car, Users, ClipboardCheck, Check, Plane, Plus, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useTravelContext } from '../../context/TravelContext';
 import type { Passenger, TravelRequest } from '../../types';
 import './TravelerPageV2.css';
@@ -12,9 +13,9 @@ interface PassengerForm {
 }
 
 const STEPS = [
-  { label: 'بيانات السيارة', icon: '🚗' },
-  { label: 'المسافرون', icon: '👥' },
-  { label: 'المراجعة والإرسال', icon: '🧾' },
+  { label: 'بيانات السيارة', Icon: Car },
+  { label: 'المسافرون', Icon: Users },
+  { label: 'المراجعة والإرسال', Icon: ClipboardCheck },
 ];
 
 function emptyPassenger(): PassengerForm {
@@ -110,7 +111,9 @@ export function TravelerPageV2() {
   return (
     <div className="v2-page traveler-v2">
       <div className="v2-page-header">
-        <span className="v2-eyebrow">✈️ نقطة العبور الذكية</span>
+        <span className="v2-eyebrow">
+          <Plane size={14} strokeWidth={2.25} /> نقطة العبور الذكية
+        </span>
         <h1>مسافر</h1>
         <p>أدخل بيانات السيارة والمسافرين للعبور في ثلاث خطوات بسيطة</p>
       </div>
@@ -119,7 +122,9 @@ export function TravelerPageV2() {
         <>
           <div className="tv2-success-overlay" onClick={() => setShowSuccess(false)}></div>
           <div className="tv2-success-message">
-            <span className="tv2-success-icon">✓</span>
+            <span className="tv2-success-icon">
+              <Check size={28} strokeWidth={3} />
+            </span>
             <h3>تم الإرسال بنجاح!</h3>
             <p>تم إرسال طلب العبور وسيتم مراجعته من قبل الإدارة</p>
           </div>
@@ -135,7 +140,9 @@ export function TravelerPageV2() {
               onClick={() => goToStep(i)}
               disabled={i >= step}
             >
-              <span className="tv2-step-circle">{i < step ? '✓' : s.icon}</span>
+              <span className="tv2-step-circle">
+                {i < step ? <Check size={20} strokeWidth={2.5} /> : <s.Icon size={20} strokeWidth={2} />}
+              </span>
               <span className="tv2-step-label">{s.label}</span>
             </button>
             {i < STEPS.length - 1 && <span className={`tv2-step-line ${i < step ? 'done' : ''}`} />}
@@ -239,7 +246,7 @@ export function TravelerPageV2() {
               ))}
             </div>
             <button type="button" className="tv2-add-passenger-btn" onClick={addPassenger}>
-              <span>+</span> إضافة مسافر
+              <Plus size={18} strokeWidth={2.5} /> إضافة مسافر
             </button>
           </section>
         )}
@@ -248,7 +255,7 @@ export function TravelerPageV2() {
           <section className="tv2-section">
             <div className="tv2-review-block">
               <div className="tv2-review-title">
-                <span>🚗</span> بيانات السيارة
+                <Car size={18} strokeWidth={2} /> بيانات السيارة
                 <button type="button" className="tv2-edit-link" onClick={() => setStep(0)}>
                   تعديل
                 </button>
@@ -262,7 +269,7 @@ export function TravelerPageV2() {
 
             <div className="tv2-review-block">
               <div className="tv2-review-title">
-                <span>👥</span> المسافرون ({passengers.length})
+                <Users size={18} strokeWidth={2} /> المسافرون ({passengers.length})
                 <button type="button" className="tv2-edit-link" onClick={() => setStep(1)}>
                   تعديل
                 </button>
@@ -289,13 +296,13 @@ export function TravelerPageV2() {
         <div className="tv2-nav-buttons">
           {step > 0 && (
             <button type="button" className="v2-btn v2-btn-ghost" onClick={goBack}>
-              رجوع
+              <ArrowRight size={16} strokeWidth={2.25} /> رجوع
             </button>
           )}
           <div className="tv2-nav-spacer" />
           {step < STEPS.length - 1 ? (
             <button type="button" className="v2-btn v2-btn-primary" onClick={goNext}>
-              التالي
+              التالي <ArrowLeft size={16} strokeWidth={2.25} />
             </button>
           ) : (
             <button
@@ -304,7 +311,13 @@ export function TravelerPageV2() {
               onClick={handleSubmit}
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'جاري الإرسال...' : 'إرسال طلب العبور'}
+              {isSubmitting ? (
+                'جاري الإرسال...'
+              ) : (
+                <>
+                  إرسال طلب العبور <Check size={17} strokeWidth={2.5} />
+                </>
+              )}
             </button>
           )}
         </div>

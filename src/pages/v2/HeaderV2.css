@@ -38,7 +38,8 @@
   justify-content: center;
   background: linear-gradient(135deg, #10b981, #06b6d4);
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
-  font-size: 1.2rem;
+  color: #04121c;
+  flex-shrink: 0;
 }
 
 .v2-logo-text-group {
@@ -95,7 +96,14 @@
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
 }
 
+.v2-nav-icon {
+  flex-shrink: 0;
+}
+
 .v2-classic-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
